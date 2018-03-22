@@ -1,0 +1,65 @@
+\documentclass{article}
+
+\usepackage{listings}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+
+\hypersetup{
+    colorlinks=true, %set true if you want colored links
+    linktoc=all,     %set to all if you want both sections and subsections linked
+    linkcolor=blue,  %choose some color if you want links to stand out
+}
+ 
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\usepackage{listings}
+
+\lstdefinestyle{bashcode}{
+  language=bash,
+  basicstyle=\ttfamily,
+  caption=Bash example,
+  backgroundcolor=\color{backcolour},
+  frame=single,
+  numbers=left,                    
+  xleftmargin=40pt,
+  breaklines=true,
+  xrightmargin=40pt
+}
+
+\lstset{style=bashcode}
+
+
+\begin{document}
+
+\tableofcontents
+
+\section{Commands in terminal}
+
+\section{Special charactters}
+\begin{tabular}{|l|p{0.8\linewidth}|} \hline
+$Character$ & $Description$ \\ \hline
+	space, tab, newline & Separates arguments, if you write several continuos they will be ignored \\
+	\$ (expansion) & Parameter expansion \$PWD, command substitution \$(command), arithmetic expansion \$((expression))\\
+	'' (single quotes) & Allows literal meaning, bash won't try to interpretate \\
+	"" (double quotes) & Text inside won't split from spaces \\
+	$\backslash$ (Escape) & Escape characters, doesn't work inside sigle quotes \\
+	\# (Comment) & Comments \\
+	$[[]]$ (test) & Test true or false conditions \\
+	! (exclamation mark) & Negation \\
+	<> (more, less) & Redirection \\
+	| (pipe) & Redirection to another command \\
+	; (command separator) & Represents a new line when commands are in the same one \\
+	\{\} (Inline group) & Commands inside will be treated as one command \\
+	() (Subshell group) & Commands inside will be executed in a subshell \\
+	(()) (Aritmetic expression) & Used for variables assigments or tests \\
+	\~{} (Home directory) & Used to represent home directory as ~/Documents or ~jesus/Documents (same) \\
+	\hline
+\end{tabular}
+
+\begin{lstlisting}[caption=Something]
+Here is the code's format i want to show in latex
+This is another line
+\end{lstlisting}
+
+\end{document}

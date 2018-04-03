@@ -1,6 +1,6 @@
 # Beanstalkd
 
-Protocol: https://github.com/kr/beanstalkd/blob/v1.3/doc/protocol.txt
+(Protocol)[https://github.com/kr/beanstalkd/blob/v1.3/doc/protocol.txt]
 
 ### connect
 You can connect through Telnet 
@@ -19,9 +19,11 @@ The '#' will be the escape character (seems ctr + ] won't work with the rlwrap)
 ### commands
 
 ```
-list-tubes
 use queue_name
+list-tubes
 peek-buried
+stats
 delete id
+kick X // Kick X buried/delayed jobs
 ```
 

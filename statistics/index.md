@@ -11,7 +11,7 @@ We can divide the statistics in 3 parts:
 ## Summary of the data.
 
 ### Mean
-$$\sum_{i=1}^nx_i/n$$
+$$\sum_{i=1}^n\frac{x_i}/{n}$$
 
 ### Median
-Order all the elements by value, if is odd then get the one in the middle, if is even take the both in the middle and $${x_i + x_{i+1}}/2$$
+Order all the elements by value, if is odd then get the one in the middle, if is even take the both in the middle and $$\frac{x_i + x_{i+1}}/{2}$$

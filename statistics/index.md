@@ -47,13 +47,13 @@ The variance is represented as $$\sigma^2$$ As well we have the Sample variance 
 
 Defined as:
 
-$$\sigma^2 = \frac{1}{N} \sum_{i=1}^N (x_i -\mu)$$
+$$\sigma^2 = \frac{1}{N} \sum_{i=1}^N (x_i -\mu)^2$$
 
-$$S^2 = \frac{1}{n - 1} \sum_{i=1}^n (x_i -\bar{x})$$
+$$S^2 = \frac{1}{n - 1} \sum_{i=1}^n (x_i -\bar{x})^2$$
 
 The difference between both of them is that in the case of Sample variance, we have take a sample of the data, so we are "bias", in order to make it less bias, we will divide by a smaller number to have a bigger value. (unbiased).
 
-(here you can find an explanation)[https://www.khanacademy.org/math/ap-statistics/summarizing-quantitative-data-ap/more-standard-deviation/v/review-and-intuition-why-we-divide-by-n-1-for-the-unbiased-sample-variance]
+[here you can find an explanation](https://www.khanacademy.org/math/ap-statistics/summarizing-quantitative-data-ap/more-standard-deviation/v/review-and-intuition-why-we-divide-by-n-1-for-the-unbiased-sample-variance)
 
 We define the standar deviation as the square root of the variance.
 

@@ -1,6 +1,7 @@
 # DNS
 
-Domain Name System. [comic](https://howdns.works/)
+Domain Name System. 
+[Comic](https://howdns.works/).
 
 Is a protocol to translate domain names into IP addresses. Using a distributed DB that implement hierarchical name systems.
 
@@ -253,7 +254,8 @@ There are surging some protocols to encrypt it:
 - DNSCrypt
 - DNS over TLS
 - DNS over HTTPS
-[more info](https://arstechnica.com/information-technology/2018/04/how-to-keep-your-isps-nose-out-of-your-browser-history-with-encrypted-dns/)
+
+[More info](https://arstechnica.com/information-technology/2018/04/how-to-keep-your-isps-nose-out-of-your-browser-history-with-encrypted-dns/)
 
 ### DNS cache poisoning
 
@@ -261,7 +263,8 @@ If a DNS server is compromised, the attacker my change the cache, directing the 
 
 ### DDoS
 
-If a DNS server receive so many request that can't response new ones. It is possible that a lot of web pages stop working. [example](https://www.pcworld.com/article/3133847/internet/ddos-attack-on-dyn-knocks-spotify-twitter-github-etsy-and-more-offline.html)
+If a DNS server receive so many request that can't response new ones. It is possible that a lot of web pages stop working.
+[Example](https://www.pcworld.com/article/3133847/internet/ddos-attack-on-dyn-knocks-spotify-twitter-github-etsy-and-more-offline.html)
 
 
 

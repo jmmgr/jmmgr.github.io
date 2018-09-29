@@ -1,7 +1,53 @@
 # Cryptography
 
+## Content
+
+<!-- toc -->
+
+- [Bibliography](#bibliography)
+- [Cipher / Symetric](#cipher--symetric)
+  * [XOR](#xor)
+    + [One time pads](#one-time-pads)
+  * [Block ciphers](#block-ciphers)
+    + [AES](#aes)
+    + [DES/3DES](#des3des)
+    + [Stream Ciphers](#stream-ciphers)
+      - [ECB mode](#ecb-mode)
+      - [CBC mode](#cbc-mode)
+      - [CTR mode](#ctr-mode)
+      - [Native stream ciphers](#native-stream-ciphers)
+  * [gpg symmetric](#gpg-symmetric)
+- [Public Key / Asymmetric](#public-key--asymmetric)
+  * [key exchange](#key-exchange)
+    + [Diffie Hellman](#diffie-hellman)
+      - [Discrete logarithm](#discrete-logarithm)
+      - [Elliptic curves](#elliptic-curves)
+      - [Problem with Diffie Hellman](#problem-with-diffie-hellman)
+    + [RSA](#rsa)
+      - [Modular arithmetic](#modular-arithmetic)
+      - [Problems with RSA](#problems-with-rsa)
+  * [gpg asymmetric](#gpg-asymmetric)
+    + [Export a public key](#export-a-public-key)
+    + [Import other people public keys](#import-other-people-public-keys)
+  * [export the private key](#export-the-private-key)
+  * [Revoke a public key](#revoke-a-public-key)
+- [Hash functions](#hash-functions)
+  * [MD5](#md5)
+  * [SHA-1](#sha-1)
+  * [SHA2](#sha2)
+  * [Password storage](#password-storage)
+    + [Rainbow tables](#rainbow-tables)
+  * [Hash trees/Merkle tree](#hash-treesmerkle-tree)
+- [MAC](#mac)
+  * [Combining MAC and message](#combining-mac-and-message)
+- [Checksums](#checksums)
+- [Signature algorithms](#signature-algorithms)
+
+<!-- tocstop -->
+
 ## Bibliography
 [Crypto 101](https://github.com/crypto101/crypto101.github.io/raw/master/Crypto101.pdf)
+
 [GNU privacy handbook](https://www.gnupg.org/gph/en/manual.html)
 
 ## Cipher / Symetric

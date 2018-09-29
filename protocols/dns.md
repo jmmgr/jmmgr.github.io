@@ -3,6 +3,31 @@
 Domain Name System. 
 [Comic](https://howdns.works/).
 
+## Content
+
+<!-- toc -->
+
+- [Introduction](#introduction)
+- [Commands](#commands)
+  * [dig](#dig)
+  * [nslookup](#nslookup)
+- [Flow](#flow)
+  * [Root](#root)
+  * [TLD](#tld)
+  * [Second level domains](#second-level-domains)
+  * [Subdomain](#subdomain)
+  * [Hosts](#hosts)
+- [DNS resolver](#dns-resolver)
+- [Type of resource records](#type-of-resource-records)
+- [Domain registrar](#domain-registrar)
+- [DNS security](#dns-security)
+  * [Encryption](#encryption)
+  * [DNS cache poisoning](#dns-cache-poisoning)
+  * [DDoS](#ddos)
+- [Dynamic DNS](#dynamic-dns)
+
+<!-- tocstop -->
+
 Is a protocol to translate domain names into IP addresses. Using a distributed DB that implement hierarchical name systems.
 
 ## Introduction

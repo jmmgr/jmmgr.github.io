@@ -1,4 +1,7 @@
 # Protocols
 
-### [dns](dns)
+### [DNS](dns)
+### [TLS](tls)
+### [TCP](tcp)
+### [UDP](udp)
 

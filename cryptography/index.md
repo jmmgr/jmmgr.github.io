@@ -373,6 +373,8 @@ Deriving P and Q from N when they are very big number is very difficult.
 One of the problems with RSA is that only can encrypt a number as big as the mod N.
 As well they are much slower that the symmetric encryption schemes.
 
+RSA doesn't follow forward secrecy (if you don't create ephemeral keys).
+
 ### gpg asymmetric
 
 generate public/private key pair

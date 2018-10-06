@@ -6,6 +6,16 @@ As well known as SSL (SSL is the old standard).
 
 ## Content
 
+<!-- toc -->
+
+- [Introduction](#introduction)
+  * [TLS handshake](#tls-handshake)
+  * [Pre master secret vs master secret](#pre-master-secret-vs-master-secret)
+  * [Certificate Authorities](#certificate-authorities)
+  * [SNI and domain fronting](#sni-and-domain-fronting)
+
+<!-- tocstop -->
+
 ## Introduction
 
 The goal of TLS is transport bytes securerly over internet or other networks. It's an hybrid cryptosytem, it uses both symmetric and asymmetric encrytption algorithms. Using different encrytptions schemas for different purposes.
@@ -82,3 +92,16 @@ When a TLS client connects to a server, that server provides a certificate chain
 You can generate your own CA. Depending of the protocol may be rejected.
 - HTTPS -> Some browsers won't allow visit the webpage.
 - OpenVPN -> We can create our own CA, for example [when we set the router to suppport OpenVPN](https://www.forshee.me/2016/03/16/ubiquiti-edgerouter-lite-setup-part-5-openvpn-setup.html).
+
+### SNI and domain fronting
+[Server Name Indication](https://en.wikipedia.org/wiki/Server_Name_Indication) is an extension of TLS, on which the client can indicate the hostname he is trying to connect at the start of the handshaking TLS.
+The reason to include the hostname is when we want one IP to provide different certificates. In order to know which certificate need to be selected for the handshake we use the host provided in the SNI.
+
+Because is at the start of the Handshake this information won't be encrypted.
+
+This provide one advantage (one IP can host different services), but in the other hand some countries have been use this for [censoring] (https://signal.org/blog/looking-back-on-the-front/)
+
+One way to avoid censoring this some companies like [Signal](https://signal.org/blog/looking-back-on-the-front/) have been using [domain fronting](https://www.bamsoftware.com/papers/fronting/). Some server provides have the peculiarity that if you provide as a SNI hostname a webpage from their domain, thy will end up redirecting to the actual server described in the HTTP data. (After decrypt).
+So lets say that if you are usig GCP service, you can set your SNI hostname as ```google.com```, and the encrypt HTTP will have the info to which host to redirect.
+
+Unfortunately this is considered a breach in the Terms and Conditions of GCP and AWS, and asked Signal to cease using it.

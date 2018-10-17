@@ -75,7 +75,7 @@ function merge_sort (array) {
 	if (array.length <= 1) {
 		return array;
 	}
-	const middle = array.length / 2;
+	const middle = Math.floor(array.length / 2);
 	const left = merge_sort(array.splice(0, middle));
 	const right = merge_sort(array);
 	// merge both arrays together

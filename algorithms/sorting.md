@@ -28,8 +28,8 @@ Complexity:
 - Best case scenario: O(n).
 - Average case scenario: O(n^2).
 
-!(insertion sort gif)[https://upload.wikimedia.org/wikipedia/commons/0/0f/Insertion-sort-example-300px.gif]
-!(insertion sort gif2)[https://upload.wikimedia.org/wikipedia/commons/4/42/Insertion_sort.gif]
+![insertion sort gif](https://upload.wikimedia.org/wikipedia/commons/0/0f/Insertion-sort-example-300px.gif)
+![insertion sort gif2](https://upload.wikimedia.org/wikipedia/commons/4/42/Insertion_sort.gif)
 
 Example using JS.
 ```
@@ -61,9 +61,9 @@ Complexity:
 - Best case scenario: O(nlog(n)).
 - Average case scenario: O(nlog(n)).
 
-!(merge sort order gif)[https://upload.wikimedia.org/wikipedia/commons/c/cc/Merge-sort-example-300px.gif]
-!(merge sort visualize gif)[https://upload.wikimedia.org/wikipedia/commons/c/c5/Merge_sort_animation2.gif]
-!(merge sort image)[https://ds055uzetaobb.cloudfront.net/image_optimizer/ecf26f1700ce8f8a6aa757e5a67dae09579d16e4.jpg]
+![merge sort order gif](https://upload.wikimedia.org/wikipedia/commons/c/cc/Merge-sort-example-300px.gif)
+![merge sort visualize gif](https://upload.wikimedia.org/wikipedia/commons/c/c5/Merge_sort_animation2.gif)
+![merge sort image](https://ds055uzetaobb.cloudfront.net/image_optimizer/ecf26f1700ce8f8a6aa757e5a67dae09579d16e4.jpg)
 
 
 
@@ -122,7 +122,7 @@ Complexity:
 
 Notice that in general Quick sort is faster than merge sort.
 
-!(quick sort merge)[https://upload.wikimedia.org/wikipedia/commons/6/6a/Sorting_quicksort_anim.gif]
+![quick sort merge](https://upload.wikimedia.org/wikipedia/commons/6/6a/Sorting_quicksort_anim.gif)
 
 Example in JS:
 ```

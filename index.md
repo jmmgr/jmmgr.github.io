@@ -9,4 +9,4 @@
 ### [Finance](jmmgr.github.io/finance)
 ### [Protocols](jmmgr.github.io/protocols)
 ### [Encoding](jmmgr.github.io/encoding)
-### [Algorithms](jmmgr.github.io)
+### [Algorithms](jmmgr.github.io/algorithms)

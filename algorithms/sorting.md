@@ -8,6 +8,7 @@
 - [Insertion Sort](#insertion-sort)
 - [Merge Sort](#merge-sort)
 - [Quick Sort](#quick-sort)
+- [Bubble Sort](#bubble-sort)
 
 <!-- tocstop -->
 

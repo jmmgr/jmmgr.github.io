@@ -2,7 +2,7 @@
 
 ### [bash](jmmgr.github.io/bash)
 ### [redis](jmmgr.github.io/redis)
-### [beanstald](jmmgr.github.io/beanstalkd)
+### [queues](jmmgr.github.io/queues)
 ### [mongodb](jmmgr.github.io/mongodb)
 ### [Terminal tools](jmmgr.github.io/terminal_tools)
 ### [Cryptography](jmmgr.github.io/cryptography)
@@ -11,3 +11,4 @@
 ### [Encoding](jmmgr.github.io/encoding)
 ### [Algorithms](jmmgr.github.io/algorithms)
 ### [MySQL](jmmgr.github.io/mySQL)
+### [Mix](jmmgr.github.io/mix)

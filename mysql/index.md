@@ -4,7 +4,56 @@
 
 <!-- toc -->
 
+- [Introduction](#introduction)
+- [join](#join)
+  * [inner join](#inner-join)
+  * [left join](#left-join)
+  * [right join](#right-join)
+  * [full join](#full-join)
+- [regexp](#regexp)
+- [case](#case)
+- [having](#having)
+- [string](#string)
+- [number](#number)
+
+<!-- tocstop -->
+
 ## Introduction
+
+## join
+There are 4 types of joins.
+
+Employee --> id
+Address -> country
+
+### inner join
+select e.id, country from Employee as e
+join Address as a
+on e.id = a.employee_id
+
+You will have the list of the employes that have a country in addres
+
+### left join
+select e.id, country from Employee as e
+left join Address as a
+on e.id = a.employee_id
+
+You will have the list of All the employes with country in the right, some countries may be null. if not informed.
+
+### right join
+select e.id, country from Employee as e
+right join Address as a
+on e.id = a.employee_id
+where e.id is NULL
+
+You may want to find which address doesn't have a record in employees
+
+### full join
+select e.id, country from Employee as e
+full join Address as a
+on e.id = a.employee_id
+
+Just see all, sometimes id will be null, sometimes country will be null
 
 ## regexp
 

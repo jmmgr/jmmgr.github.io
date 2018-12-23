@@ -139,13 +139,16 @@ key sizes supported 128, 192 and 256 bits. Depending of the key size will have 1
 High-level explanation of the Algorithm:
 1. KeyExpansion, The key schedule is the process which AES uses to derive 128-bit keys for each round from one master key.
 2. Initial round key addition:
+
 		- AddRoundKey—each byte of the state is combined with a block of the round key using bitwise xor.
 3. 9, 11 or 13 rounds:
- 		- SubBytes—a non-linear substitution step where each byte is replaced with another according to a lookup table.
-		- ShiftRows—a transposition step where the last three rows of the state are shifted cyclically a certain number of steps.
-		- MixColumns—a linear mixing operation which operates on the columns of the state, combining the four bytes in each column.
+	
+ 		- SubBytes -> a non-linear substitution step where each byte is replaced with another according to a lookup table.
+		- ShiftRows —> a transposition step where the last three rows of the state are shifted cyclically a certain number of steps.
+		- MixColumns —> a linear mixing operation which operates on the columns of the state, combining the four bytes in each column.
 		- AddRoundKey
 4. Final round (making 10, 12 or 14 rounds in total):
+
 		- SubBytes
 		- ShiftRows
 		- AddRoundKey
@@ -325,7 +328,7 @@ To avoid it, we need to find ways for Alice to identify is talking with Bob, and
 RSA can be use to share key, encrypt and authenticate. Is a much more complete schema than Diffie hellman
 
 With RSA a user will have Public and Private Key. If someone wants to send him something will use the user public key (only the private key can decrypt). 
-RSA relies in modular arithmetic (it can uses as well Elliptic Curve).
+RSA relies in modular arithmetic.
 
 ##### Modular arithmetic
 Encryption

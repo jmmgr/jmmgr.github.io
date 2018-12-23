@@ -68,12 +68,12 @@ If the client send the sequence number ```A```, the server should response with 
 In words (32 bits), how big is this header. When the the data stars.
 ### Control bits
 1 bit each
-URG -> The Urgent Pointer is significant.
-ACK -> ACK fiels is signficant (information in ACK Number is valid).
-PSH -> Push function, the Sender send it to clean all the buffers of data.
-RST -> Tells the receiving TCP stack to immediately abort the connection.
-SYN -> Used in establishing a TCP connection to synchronize the sequence numbers between both endpoints.
-FIN -> Used to indicate that the client will send no more data (but will continue to listen for data).
+- URG -> The Urgent Pointer is significant.
+- ACK -> ACK fiels is signficant (information in ACK Number is valid).
+- PSH -> Push function, the Sender send it to clean all the buffers of data.
+- RST -> Tells the receiving TCP stack to immediately abort the connection.
+- SYN -> Used in establishing a TCP connection to synchronize the sequence numbers between both endpoints.
+- FIN -> Used to indicate that the client will send no more data (but will continue to listen for data).
 
 ### Window
 16 bit.
@@ -95,9 +95,9 @@ Zero bit up to the next 32 bits. (so the header ocuppies a multiple of a word).
 
 ## TCP handshake
 Is a 3 way handshake:
-Client --> SYN --> Server
-Server --> SYN-ACK --> Client
-Client --> ACK --> Server
+- Client --> SYN --> Server
+- Server --> SYN-ACK --> Client
+- Client --> ACK --> Server
 
 The handshake is mean to synchronize the sequences numbers of the client and the server.
 1. C SYN S
@@ -112,10 +112,10 @@ ACK numbe ris set to B+1
 ## TCP termination
 Is a 4 way handshake.
 Any of the ends can close the connection. There is one Initiator and one Receiver.
-I --> FIN --> R
-R --> ACK --> I
-R --> FIN --> I
-I --> ACK --> R
+- I --> FIN --> R
+- R --> ACK --> I
+- R --> FIN --> I
+- I --> ACK --> R
 
 A connection can be half open, one end sending FIN, and the the other not. FIN only means that end won't send more data.
 After the side that sent the first FIN has responded with the final ACK, it waits for a timeout before finally closing the connection, during which time the local port is unavailable for new connections; this prevents confusion due to delayed packets being delivered during subsequent connections. 

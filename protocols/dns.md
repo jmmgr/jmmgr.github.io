@@ -119,11 +119,11 @@ As we said before DNS is a hierarchical DB.
 
 When there is a request of information it may pass different types of servers.
 
-1) Root Level
-2) TLD (Top Level Domains)
-3) Second Level Domains
-4) Sub-Domain
-5) Host
+1. Root Level
+2. TLD (Top Level Domains)
+3. Second Level Domains
+4. Sub-Domain
+5. Host
 
 ### Root
 There is 13 servers provided as Root, a DNS resolver must know their address (or know another resolver that knows them). Is the top of the hierarchy.

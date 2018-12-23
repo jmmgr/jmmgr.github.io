@@ -106,8 +106,8 @@ Sequence number is set to a random number A.
 Sequence number is set to a random number B.
 ACK number is set to A+1 (next sequence it expects).
 1. C ACK S
-Sequence numer is set to A+1
-ACK numbe ris set to B+1
+Sequence number is set to A+1
+ACK number is set to B+1
 
 ## TCP termination
 Is a 4 way handshake.

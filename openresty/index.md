@@ -1,8 +1,37 @@
-# Template
+# Openresty
 
 ## Content
 
 <!-- toc -->
+
+- [Introduction](#introduction)
+- [Basic directives:](#basic-directives)
+  * [lua_code_cache](#lua_code_cache)
+  * [init_by_lua](#init_by_lua)
+  * [init_by_lua_file](#init_by_lua_file)
+  * [set_by_lua](#set_by_lua)
+  * [set_by_lua_file](#set_by_lua_file)
+  * [content_by_lua_block](#content_by_lua_block)
+  * [content_by_lua_file](#content_by_lua_file)
+  * [rewrite_by_lua_block](#rewrite_by_lua_block)
+  * [access_by_lua_block](#access_by_lua_block)
+- [Nnginx API](#nnginx-api)
+  * [ngx.location.capture](#ngxlocationcapture)
+  * [ngx.location.capture.multi](#ngxlocationcapturemulti)
+  * [req](#req)
+    + [headers](#headers)
+    + [body](#body)
+    + [method](#method)
+    + [URI](#uri)
+    + [URL arguments](#url-arguments)
+  * [res](#res)
+    + [headers](#headers-1)
+    + [status](#status)
+    + [body](#body-1)
+  * [Debug](#debug)
+  * [Working with JSON](#working-with-json)
+
+<!-- tocstop -->
 
 ## Introduction
 

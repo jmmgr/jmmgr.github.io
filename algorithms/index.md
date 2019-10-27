@@ -1,6 +1,6 @@
 # Algorihtms
 
-### [Sorting](sorting)
-### [Search](search)
-### [Trees](trees)
-### [Common Problems](common_problems)
+### [Sorting](sorting.md)
+### [Search](search.md)
+### [Trees](trees.md)
+### [Common Problems](common_problems.md)

@@ -1,4 +1,4 @@
 # Queues
 
-### [Beanstalkd](beanstalkd)
-### [RabbitMQ](rabbitmq)
+### [Beanstalkd](beanstalkd.md)
+### [RabbitMQ](rabbitmq.md)

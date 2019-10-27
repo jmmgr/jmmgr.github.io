@@ -1,8 +1,8 @@
 # Protocols
 
-### [DNS](dns)
-### [TLS](tls)
-### [TCP](tcp)
-### [UDP](udp)
-### [IP](ip)
+### [DNS](dns.md)
+### [TLS](tls.md)
+### [TCP](tcp.md)
+### [UDP](udp.md)
+### [IP](ip.md)
 

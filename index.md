@@ -1,7 +1,7 @@
 # wiki
 
 ### [bash](jmmgr.github.io/bash)
-### [redis](jmmgr.github.io/redis)
+### [redis](redis/index.md)
 ### [queues](jmmgr.github.io/queues)
 ### [mongodb](jmmgr.github.io/mongodb)
 ### [Terminal tools](jmmgr.github.io/terminal_tools)

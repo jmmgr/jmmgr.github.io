@@ -43,7 +43,7 @@ That function only check which is the longest, and returns it.
 __word break__
 Decide if a string can be represented with a dic of words (without spaces).
 
-````
+```
 public boolean wordBreak(String s, Set<String> wordDict) {
 	// create an array of length of the string +1
 	int[] pos = new int[s.length()+1];

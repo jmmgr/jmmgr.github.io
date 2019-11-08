@@ -50,4 +50,18 @@ Need to confirm if ```# gpg-connect-agent updatestartuptty /bye >/dev/null``` in
 
 [Nice link setup for ssh](https://0day.work/using-a-yubikey-for-gpg-and-ssh/)
 
-## GPG
+## Sign github commits
+
+1. Add the public gpg key in github, you can export the GPG you want like
+```
+gpg --export --armor XXX
+```
+
+2. Set the proper git global config
+```
+git config --global gpg.program gpg2
+git config --global user.signingkey XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+git config --global commit.gpgsign true
+```
+
+3. We can verify in the file `~/.gitconfig` that the params are correct

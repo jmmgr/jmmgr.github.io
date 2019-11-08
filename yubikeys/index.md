@@ -48,4 +48,6 @@ This pientry is the one I like the most in Manjaro. The pientry-tty is a mess, i
 
 Need to confirm if ```# gpg-connect-agent updatestartuptty /bye >/dev/null``` in ```~/.zshrc``` is useful or not
 
+[Nice link setup for ssh](https://0day.work/using-a-yubikey-for-gpg-and-ssh/)
+
 ## GPG

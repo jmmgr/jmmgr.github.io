@@ -11,6 +11,11 @@ Common problems with Yubikey
 
 ## SSH
 
+We can extract the ssh keys from the GPG as:
+```
+gpg --export-ssh-key key_id
+```
+
 
 ### Debugging
 

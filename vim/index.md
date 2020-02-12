@@ -12,11 +12,12 @@ Some VIM knowledge that is good not to forget
 ### Setting Starscope (similar to C-tags)
 
 [Tutorial about Cscope](http://cscope.sourceforge.net/cscope_vim_tutorial.html)
-[Tutorial about Starscope] (https://github.com/eapache/starscope/blob/master/doc/USER_GUIDE.md)
 
-Csope is for `c` if you want another language you need a similar tool that generate similar files.
+[Tutorial about Starscope](https://github.com/eapache/starscope/blob/master/doc/USER_GUIDE.md)
 
-Statscope supports Ruby and Javascript.
+Csope is for `c` if you want another language you need a tool that generate similar files.
+
+Starscope supports Ruby and Javascript.
 
 You can install as `gem install starscope`
 

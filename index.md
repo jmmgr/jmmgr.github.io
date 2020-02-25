@@ -12,3 +12,5 @@
 ### [Algorithms](algorithms/index.md)
 ### [MySQL](mySQL/index.md)
 ### [Mix](mix/index.md)
+### [Yubikeys](yubikeys/index.md)
+### [VIM](vim/index.md)

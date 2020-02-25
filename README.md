@@ -9,7 +9,7 @@ Wiki of knowledge I keep forgetting
 
 [Grip](https://github.com/joeyespo/grip) allows to preview in local with Github templates.
 
-Install
+dInstall
 
 ```
 pip install grip
@@ -35,3 +35,29 @@ Run
 npm install -g markdown-toc
 markdown-toc -i **/*.md
 ```
+
+## How to add a collapsible markdown
+
+Unfold wihout summary (by default the name will be details)
+<details>
+<p>
+
+#### Hide header
+
+```
+hide code
+```
+</p>
+</details>
+
+Unfold with summary (You can write the default name of the collapsible)
+<details><summary>Unfold, this is my name</summary>
+<p>
+
+#### Hide header
+
+```
+hide code
+```
+</p>
+</details>

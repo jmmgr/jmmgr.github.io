@@ -105,3 +105,87 @@ One way to avoid censoring this some companies like [Signal](https://signal.org/
 So lets say that if you are usig GCP service, you can set your SNI hostname as ```google.com```, and the encrypt HTTP will have the info to which host to redirect.
 
 Unfortunately this is considered a breach in the Terms and Conditions of GCP and AWS, and asked Signal to cease using it.
+
+### Certificates
+
+#### X.509
+[X.509](https://en.wikipedia.org/wiki/X.509) is the most common format for certificates. Is used in HTTPS.
+
+[RFC](https://tools.ietf.org/html/rfc5280)
+
+Common extensions of this cert are:
+- CRT -> use for certificates, it may be DER or PEM
+- CER -> Microsoft version of CRT
+- KEY -> Used for both public and private PKCS#8 keys.
+
+Common ways of encondig the cert (also use as extensions):
+- PEM -> Is an armored base64 of the binary cert. (the one that starts with -----BEGIN CERTIFICATE----)
+- DER -> Is the cert in binary.
+
+To verify the content of a cerfiticate:
+```
+openssl x509 -text -inform PEM -in client-auth-ca/staging/root/certs/ca.cert.pem
+openssl x509 -text -inform DER -in client-auth-ca/staging/root/certs/ca.cert.pem
+```
+
+For `openssl x509` PEM is the default, so no need to inform the `-inform PEM`
+
+Some common fields of this certicate are:
+- Issuer. Is the issuer (for example GoDadaddy).
+	- O (Organization)
+	- OU (Organization unit)
+	- L, ST, C (locality, state, country)
+- Validity
+	- Not Before
+    - Not After
+- Subject:
+	- CN (Common Name)
+- Subject Public Key Info -> carry the public key and identify the algorith.
+- Signature Algorithm -> contains the algorithm identifier for the algorithm used by the CA to sign the certificate.
+- X509v3 extensions.
+	- X509v3 Authority key Identifier -> Identifier of who signed this cert
+	- X509v3 Subject Key Identifier -> Identifier of this cert
+
+#### PKCS 12
+A format to store several chrptography objects in a single file.
+
+Is commonly use to bundle private key + X.509 certificate. As well can be used to bundle a chain of trust.
+
+To verify the content of a pkcs12 file:
+```
+openssl pkcs12 -in file.pkcs12
+```
+
+#### Certificate bundle
+This is just some certs written in the same file one after another.It identify the certificate chain, from your cert, to the root certificate.
+Example:
+```
+---BEGIN CERTIFICATE----
+base64 code leaf cert
+---END CERTIFICATE----
+---BEGIN CERTIFICATE----
+base64 code intermediate cert
+---END CERTIFICATE----
+---BEGIN CERTIFICATE----
+base64 code root cert
+---END CERTIFICATE----
+```
+
+Two ways to verify which one is the root cert:
+- Verify that the Issuer and Subject has the same information.
+- Verify that the `X509v3 Authority key Identifier` and `X509v3 Subject Key Identifier` has the same identifier.
+
+To verify which one is the leaf cert:
+- Verify which one has the CN of your webpage.
+
+To verify the order is correct:
+- You can check `X509v3 Authority key Identifier` and `X509v3 Subject Key Identifier`. Each intermediate has the `Authority key` set as the previous `Subject key`.
+
+### Mutual authentication
+Very nice article about TLS handshake and mutual authentication [mutual authentication](https://medium.com/sitewards/the-magic-of-tls-x509-and-mutual-authentication-explained-b2162dec4401)
+
+The idea is the server wants to make sure that the Client is who is he claiming to be. So the client will have its own certificate.
+
+There will be some new steps in the TLS handshake so the client can send its certificate.
+
+![mutual authenitcation image](https://miro.medium.com/max/952/1*P1ujapQhTYNgd2hWl_8Njg.png)

@@ -4,6 +4,13 @@
 
 <!-- toc -->
 
+- [Introduction](#introduction)
+- [SSH](#ssh)
+  * [Debugging](#debugging)
+- [Sign github commits](#sign-github-commits)
+
+<!-- tocstop -->
+
 ## Introduction
 
 Common problems with Yubikey

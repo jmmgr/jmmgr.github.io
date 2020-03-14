@@ -13,6 +13,11 @@ As well known as SSL (SSL is the old standard).
   * [Pre master secret vs master secret](#pre-master-secret-vs-master-secret)
   * [Certificate Authorities](#certificate-authorities)
   * [SNI and domain fronting](#sni-and-domain-fronting)
+  * [Certificates](#certificates)
+    + [X.509](#x509)
+    + [PKCS 12](#pkcs-12)
+    + [Certificate bundle](#certificate-bundle)
+  * [Mutual authentication](#mutual-authentication)
 
 <!-- tocstop -->
 

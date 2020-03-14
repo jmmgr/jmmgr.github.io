@@ -7,6 +7,18 @@
 - [Introduction](#introduction)
 - [Arrays and Strings](#arrays-and-strings)
   * [Problems](#problems)
+- [Hash table](#hash-table)
+- [Linked List](#linked-list)
+  * [Runner techniche](#runner-techniche)
+- [Stack and Queue](#stack-and-queue)
+- [Trees and Graph](#trees-and-graph)
+- [Bit manipulation](#bit-manipulation)
+- [Negative numbers](#negative-numbers)
+- [Get i Bit](#get-i-bit)
+- [Set i Bit](#set-i-bit)
+- [Clear i Bit](#clear-i-bit)
+- [Create a mask](#create-a-mask)
+- [Update i Bit](#update-i-bit)
 
 <!-- tocstop -->
 

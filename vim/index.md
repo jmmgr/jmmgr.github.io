@@ -4,6 +4,13 @@
 
 <!-- toc -->
 
+- [Introduction](#introduction)
+  * [Setting Starscope (similar to C-tags)](#setting-starscope-similar-to-c-tags)
+    + [Adding Cscope into VIM](#adding-cscope-into-vim)
+    + [Debugging Cscope](#debugging-cscope)
+
+<!-- tocstop -->
+
 ## Introduction
 
 Some VIM knowledge that is good not to forget

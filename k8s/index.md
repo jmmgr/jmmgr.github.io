@@ -4,6 +4,37 @@
 
 <!-- toc -->
 
+- [Introduction](#introduction)
+- [YAML files](#yaml-files)
+- [Useful Kubectl commands](#useful-kubectl-commands)
+- [Label and Selectors](#label-and-selectors)
+- [Anotations](#anotations)
+  * [Services](#services)
+  * [ETCD](#etcd)
+  * [Kube-API server](#kube-api-server)
+  * [Kube Controller Manager](#kube-controller-manager)
+  * [Kube scheduler](#kube-scheduler)
+  * [Kubelet](#kubelet)
+  * [Kube proxy](#kube-proxy)
+  * [PODs](#pods)
+  * [ReplicationController](#replicationcontroller)
+    + [Resouces and limits](#resouces-and-limits)
+  * [Replica Set](#replica-set)
+  * [Deployments](#deployments)
+  * [Namespaces](#namespaces)
+  * [ResourceQuota](#resourcequota)
+  * [Services](#services-1)
+    + [NodePort](#nodeport)
+    + [ClusterIp](#clusterip)
+  * [Scheduler](#scheduler)
+    + [nodeName](#nodename)
+    + [nodeSelectors](#nodeselectors)
+    + [Taint and Tolerance](#taint-and-tolerance)
+  * [NodeAffinity](#nodeaffinity)
+- [Daemon Sets](#daemon-sets)
+
+<!-- tocstop -->
+
 ## Introduction
 
 K8 run into a cluster, the clusters are group in nodes.
@@ -68,10 +99,61 @@ kubectl create service clusterip redis --tcp=6379:6379 --dry-run -o yaml
 kubectl expose pod redis --type=NodePort --port=6370  --name redis-service --dry-run -o yaml
 # Generate new service Nodeport (WONT use the labels of redis, will assume tha the label are app=redis)
 kubectl create service nodeport redis --tcp=6379:6379 --node-port=30080 --dry-run -o yaml
-
-
-
 ```
+
+## Label and Selectors
+
+Labels adds key-value tags to elements. Selector helps to filter those labels.
+
+In K8s the labels are defined in under metadata, you add as many labels as you want:
+```
+metadata:
+  labels:
+    a: a
+```
+
+To select the nodes, we use selectors. For example in a replicaSet:
+```
+...
+spec:
+  replica: 3
+  selector:
+    matchLabels:
+      a: a
+  template:
+    ....
+```
+
+Services don't use `matchLabel`, they are define like:
+```
+...
+spec:
+  selector: 
+    a: a
+```
+
+You can select with selectors in kubectl
+```
+kubectl get pods --selector a=a
+kubectl get pods -l a=a
+kubectl get pods --selector a=a,b=b
+kubectl get pods -l a=a,b=b
+```
+
+
+
+## Anotations
+
+You can use annotations to add some extra information to the elements. Is as well in metadata. This information won't act as labels. So you won't be able to select from them.
+```
+metadata:
+  name: ...
+  labels: ...
+  anotations:
+    a: a
+```
+
+
 
 
 
@@ -256,6 +338,39 @@ kubectl create -f example-rc.yaml
 # Get replicationControllers,  will show the status of the replicas
 kubetl get ReplicationController
 ```
+
+#### Resouces and limits
+
+There are 2 resource limits:
+- Request => Is the minimun amount, the scheduler will check which Nodes has this resources available.
+- Limit =>  The Node will throtle to that CPU. An in case the Pod use more memory, eventually will terminate it.
+
+You can assign a minimun in the namespace for containers:
+- 0.5 CPU
+- 256 Mi (2^20 Bytes)
+
+You can use M (1000^2 Bytes)
+
+By default, Containers has a limit of (maximum):
+- 1 CPU
+- 512 Mi
+
+If you want to add other values for resources:
+```
+spec:
+  containers:
+  - name
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: 1
+      limits:
+        memory: "2Gi"
+        cpu: 2
+```
+
+If a Pod consumes more CPU than the limit, it will be throttle, if it consumes more memory continuisly it will be terminate
+
 
 ### Replica Set
 The recommended way to do replication is a Deployment that use ReplicaSet
@@ -446,8 +561,7 @@ Some definitions:
 - TagetPort -> port on the node
 - Port -> port on the service
 - NodePort -> Port on the Node, the valid range is 30000-32767
-- Service IP -> The IP of the service in the cluster
-- Node IP -> The IP of the service in the cluster
+- Service IP -> The IP of the service in the cluster - Node IP -> The IP of the service in the cluster
 - Pod IP -> The IP of the Pod
 
 So an user request NodeIp:NodePort, this is proxied to the serviceIP:Port, which is proxied to the PodIp:Targetport 
@@ -492,3 +606,134 @@ spec:
      label2: label2
 ```
 
+### Scheduler
+
+K8s scheduler by default will assign Pods to Nodes. When it does it, it will inform the field `nodeName` in the Pod (with the node where it was assigned).
+
+There are 4 ways to manage which Pods goes to which selectors:
+- NodeName -> inform in the Pod which Node you want to be assigned.
+- NodeSelector -> inform in the Pod the Node using selectors (you need to create first the labels in the Node).
+- Taint and Tolerance. You force Pods not to be assigned in some Nodes. Only the ones with the Tolerance will be able to be assigned (But those with tolerance could be assigned in other Nodes as well).
+- NodeAffinity -> is like NodeSelector but much more advanced.
+ 
+#### nodeName
+
+You can manually schedule a Pod informing the `nodeName` field (under `spec`) to the node where you want to schedule it. But you only can inform it at creation time, you can't modify the Pod later with this field.
+
+If you want to change the the `nodeName` on the fly, you will need to create a Binding yaml and send it directoy to kube-api server on that pod.
+
+Binding Yaml
+```
+apiVersion: v1
+kind: Binding
+metadata:
+  name: nginx
+target:
+  apiVersion: v1
+  kind: Node # what to bind
+  name: node02 # the node to bind it with
+```
+
+Then send it to 
+```
+curl --header "Content-Type:application/json" --request POST --data '{"apiVersion":"v1", "kind": "Binding"...' http://$SERVER/api/v1/namespaces/default/pods/$PODNAME/binding/
+```
+
+#### nodeSelectors
+
+Another way to select a node from a Pod, is throuh NodeSelectors
+```
+spec:
+  containers:
+    ...
+  nodeSelector:
+    size: Large # Labels of the Nodes
+```
+
+To add labes to the Node use the command
+```
+# where size=large is the label-key and label-value
+kubectl label nodes node01 size=large
+```
+
+Node selectors has a problem, you can't select OR labels, or NOT label.. etc.
+
+#### Taint and Tolerance
+Used to set restrictions into Nodes to accept Pods. Meaning that a Pod won't be able to bschduled in a specif Node. 
+
+For example, K8s set a taint into Master Node, so no Pods can be scheduled there (only the ones with the Tolerance).
+
+You can see the taitn as
+```
+kubecl 	describe node kubemaster | grep Taint
+```
+
+Different from *Node affinity*, which is which Nodes are preferred by the Pods.
+
+Taint is like if a vacine is set in the Nodes, so the pods can't do some actions. Tolerance is like making virus tolerance to that vacine.
+
+For example:
+```
+kubectl taint nodes node1 a=a:NoSchedule
+# a=a the taint (the vacine). Needed to add tolerance later.
+# taint-effect
+#  NoSchedule -> the nodes won't schedule those Pods
+#  PrefereNoSchdule -> the nodes will try not schedule, but there is not guarantee
+#  NoExecute ->  NoShecudle + the Pods already executing will be evicted
+```
+
+The toleration is added directly in the Pods, under `spec`
+```
+spec:
+  containers:
+    ...
+  tolerations:
+  - key:"a"
+    operator:"Equal"
+    value:"a"
+    effect:"NoSchedule"
+```
+
+### NodeAffinity
+Is like Node selectors but more advance.
+
+Example in a Pod.
+```
+spec:
+  containers:
+    ...
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/e2e-az-name
+            operator: In
+            values:
+            - e2e-az1
+          - key: size
+            operator: Exists
+	...
+# this is equivalent to
+  nodeSelector:
+    size: Large
+  ...
+```
+
+But there are other operators, for example:
+- NotIn
+- Exists # check if the label key exist
+
+Depending of the behaviour we have other options
+- requiredDuringSchedulingIgnoredDuringExecution
+   - If the Afinnity rules doesn't match any Node on scheduling, it won't be schedules
+   - If when running the Pod, and there are changes (i.e. labels of the Node). Ignore the new changes (Labels on the Pod will be had in account)
+- preferredDuringShedulingIgoreDuringExection ->
+   - If the Afinnity rules doesn't match any Node on scheduling, it will ignore the affinity rules and place the Pod on any Node.
+   - If when running the Pod, and there are changes (i.e. labels of the Node). Ignore the new changes (Labels on the Pod will be had in account)
+- requiredDuringSchedulingRequiredDuringExecution (not available now)->
+   - If the Afinnity rules doesn't match any Node on scheduling, it won't be schedules
+   - If when running the Pod, and there are changes (i.e. labels of the Node). Evicted the Nodes that doesn't match
+
+
+## Daemon Sets

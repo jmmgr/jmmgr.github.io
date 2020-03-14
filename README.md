@@ -26,14 +26,19 @@ grip -b
 
 Add TOC placeholders to the files that you want to have it
 ```
+
 <!-- toc -->
+
+
+
 <!-- tocstop -->
+
 ```
 
 Run
 ```
 npm install -g markdown-toc
-markdown-toc -i **/*.md
+for filename in **/*.md; do; markdown-toc -i ${filename}; done;
 ```
 
 ## How to add a collapsible markdown

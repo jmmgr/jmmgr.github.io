@@ -1,4 +1,4 @@
-# Template
+# Yubikeys
 
 ## Content
 
@@ -77,3 +77,41 @@ git config --global commit.gpgsign true
 ```
 
 3. We can verify in the file `~/.gitconfig` that the params are correct
+
+## GPG agent forwarding through ssh
+Good explanation in the [wiki](https://wiki.gnupg.org/AgentForwarding)
+
+Usually you will forward the `extra` socket, this socket is more secuire, it allows less operaions.
+```
+gpgconf --list-dir agent-extra-socket
+```
+
+And you will forward in the normal socket of the remote
+```
+gpgconf --list-dir agent-socket
+```
+
+So in your ssh.conf should be like
+```
+Host name-host
+  # The format is <remote socket> <local socket>
+  RemoteForward /run/user/1000/gnupg/S.gpg-agent /run/user/1000/gnupg/S.gpg-agent.extra
+  ForwardAgent yes
+```
+
+Thinks to have in account:
+- modify the server setgins to they have `StreamLocalBindUnlink yes`
+- if in the remote server, when you login the file `RemoteForward /run/user/1000/gnupg/S.gpg-agent` doesn't exist, you may need to add `gpgconf --create-socketdir` on the `~/.bashrc` (read the wiki)
+
+
+Remember that you need the public key imported in the remote.
+
+### How to test it
+
+You can test encrypting and derytping a file in the remote server
+
+```
+echo 'hola' > hola.txt
+gpg --encrypt --recipient jesu@gmail.com hola.txt
+gpg --decrypt hola.txt.gpg
+```

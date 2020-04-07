@@ -38,7 +38,10 @@ Add TOC placeholders to the files that you want to have it
 Run
 ```
 npm install -g markdown-toc
+
 for filename in **/*.md; do; markdown-toc -i ${filename}; done;
+# OR
+make toc
 ```
 
 ## How to add a collapsible markdown

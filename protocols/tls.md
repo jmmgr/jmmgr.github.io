@@ -18,6 +18,8 @@ As well known as SSL (SSL is the old standard).
     + [PKCS 12](#pkcs-12)
     + [Certificate bundle](#certificate-bundle)
   * [Mutual authentication](#mutual-authentication)
+- [Creating and signing certificates](#creating-and-signing-certificates)
+  * [Commands](#commands)
 
 <!-- tocstop -->
 
@@ -194,3 +196,68 @@ The idea is the server wants to make sure that the Client is who is he claiming 
 There will be some new steps in the TLS handshake so the client can send its certificate.
 
 ![mutual authenitcation image](https://miro.medium.com/max/952/1*P1ujapQhTYNgd2hWl_8Njg.png)
+
+
+## Creating and signing certificates
+
+When you have a key and you want the CA to sign, you need to create a CSR (Certificate Signing Request).
+
+Then you will need to send this CSR to the CA, and ask for the signature.
+
+Every time a CA signs a key, it needs to add a `serial`, this serial is unique by CA + Cert, and if they are not unique it may missbehave.
+The first time you sign a cert with a CA, you need to add `-CAcreateserial`, this will create a file with the seria.
+The next time you sign a cert, you will have to inform `-CAserial file_name`, adding the file with the seria.
+
+### Commands
+
+**Generate CA key and cert**
+
+Generate private key for CA:
+```
+openssl genrsa -out ca.key 2048
+# output ca.key
+```
+
+Generate a Certificate Signing Requests:
+```
+openssl req -new -key ca.key -subj "/CN=jesus-ca" -out ca.csr
+# output ca.csr
+```
+
+Sign the CA certificate (Self sign with the CA):
+```
+openssl x509 -req -days 3650 -in ca.csr -signkey ca.key -out ca.crt
+# output ca.crt
+```
+
+**Generate server key and cert**
+
+Generate private key for Server:
+```
+openssl genrsa -out jesus.key 2048
+# output jesus.key
+```
+
+Generate a Certificate Signing Requests:
+```
+openssl req -new -key jesus.key -subj "/CN=www.jesus-webpage.com" -out jesus.csr
+# output jesus.csr
+```
+
+Sign the certificate with the CA (first time signing with this CA)
+```
+openssl x509 -req -days 365 -in jesus.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out jesus.crt
+# output jesus.crt
+# output ca.srl --> This has the counter for the serials, you will need next time you sign with the same CA
+```
+
+Sign the certificate with the CA (not first time signing with this CA)
+```
+openssl genrsa -out sharon.key 2048
+openssl req -new -key sharon.key -subj "/CN=www.sharon-webpage.com" -out sharon.csr
+openssl x509 -req -days 365 -in sharon.csr -CA ca.crt -CAkey ca.key -CAserial ca.srl -out sharon.crt
+# output sharon.key
+# output sharon.csr
+# output sharon.crt
+```
+

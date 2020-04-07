@@ -42,7 +42,4 @@ compile_html:
 
 .PHONY: toc
 toc:
-	@for f in **/*.md; \
-	do \
-		markdown-toc -i $$f; \
-	done
+	for f in **/*.md;  do markdown-toc -i $$f; done

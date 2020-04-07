@@ -14,3 +14,4 @@
 ### [Mix](mix/index.md)
 ### [Yubikeys](yubikeys/index.md)
 ### [VIM](vim/index.md)
+### [Linux](linux/index.md)

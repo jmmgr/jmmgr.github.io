@@ -20,7 +20,7 @@
 - [(hash) can substitute for zero or more words.](#hash-can-substitute-for-zero-or-more-words)
   * [Code examples](#code-examples)
     + [Hello world](#hello-world)
-    + [Manually ACK](#manually-ack)
+    + [Manually ACK](#manualy-ack)
     + [Durability](#durability-1)
     + [Distpatch](#distpatch)
     + [Exchange fanout](#exchange-fanout)
@@ -31,6 +31,7 @@
 <!-- tocstop -->
 
 ## Introduction
+[Rabbitmq Protocol](https://www.rabbitmq.com/resources/specs/amqp0-9-1.pdf)
 
 RabbitMQ is a message broker, can work distributed.
 We got this info base in the (getting started)[https://www.rabbitmq.com/getstarted.html]
@@ -62,7 +63,7 @@ Usually the users will have several endpoints to connect, if one fail, will reco
 
 ### Automatic and manual ACK
 Once RabbitMQ delivers a message to the customer it immediately marks it for deletion. In this case, if you kill a worker we will lose the message it was just processing. We'll also lose all the messages that were dispatched to this particular worker but were not yet handled.
-This is the default behaviour, but you can sent autoACK to false (in the basicConsume), and then you need to expplicity send the ack, there is not timeout, RabittMQ will check if the worker is alive. If the worker dies will send to another.
+This is the default behaviour, but you can sent autoACK to false (in the basicConsume), and then you need to explicity send the ack, there is not timeout, RabittMQ will check if the worker is alive. If the worker dies will send to another.
 
 ### Durability
 When RabbitMQ quits or crashes it will forget the queues and messages unless you tell it not to. Two things are required to make sure that messages aren't lost: we need to mark both the queue and messages as durable.
@@ -239,7 +240,7 @@ Listing the queues
 sudo rabbitmqctl list_queues
 ```
 
-Checking which messages hasn't been ack (only on manually akc).
+Checking which messages hasn't been ack (only on manualy ack).
 ```
 sudo rabbitmqctl list_queues name messages_ready messages_unacknowledged
 ```

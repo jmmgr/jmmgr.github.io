@@ -1,5 +1,4 @@
 # k8s
-
 ## Content
 
 <!-- toc -->
@@ -9,7 +8,7 @@
 - [Useful Kubectl commands](#useful-kubectl-commands)
 - [Label and Selectors](#label-and-selectors)
 - [Anotations](#anotations)
-  * [Services](#services)
+- [K8 Services, Controllers and Resources](#k8-services-controllers-and-resources)
   * [ETCD](#etcd)
   * [Kube-API server](#kube-api-server)
   * [Kube Controller Manager](#kube-controller-manager)
@@ -23,15 +22,46 @@
   * [Deployments](#deployments)
   * [Namespaces](#namespaces)
   * [ResourceQuota](#resourcequota)
-  * [Services](#services-1)
+  * [Services](#services)
     + [NodePort](#nodeport)
     + [ClusterIp](#clusterip)
-  * [Scheduler](#scheduler)
-    + [nodeName](#nodename)
-    + [nodeSelectors](#nodeselectors)
-    + [Taint and Tolerance](#taint-and-tolerance)
+- [Scheduler](#scheduler)
+  * [nodeName](#nodename)
+  * [nodeSelectors](#nodeselectors)
+  * [Taint and Tolerance](#taint-and-tolerance)
   * [NodeAffinity](#nodeaffinity)
-- [Daemon Sets](#daemon-sets)
+  * [DaemonSet](#daemonset)
+  * [Static Pods](#static-pods)
+  * [Multiple schedulers](#multiple-schedulers)
+- [Monitor K8s](#monitor-k8s)
+- [Application lifecyle managements](#application-lifecyle-managements)
+  * [Rolling updates and Rollbacks in deployment](#rolling-updates-and-rollbacks-in-deployment)
+  * [Commands and arguments](#commands-and-arguments)
+  * [ENV variables](#env-variables)
+  * [ConfigMaps](#configmaps)
+  * [Secrets](#secrets)
+  * [InitContainers](#initcontainers)
+- [Cluster Maintenance](#cluster-maintenance)
+  * [Draining Nodes](#draining-nodes)
+- [Cluster upgrade of K8s](#cluster-upgrade-of-k8s)
+  * [Back up and restore](#back-up-and-restore)
+- [Security](#security)
+  * [Authentication](#authentication)
+    + [Baic auth + Token auth](#baic-auth--token-auth)
+    + [PKI in K8s](#pki-in-k8s)
+      - [Keys and certs needed in K8s](#keys-and-certs-needed-in-k8s)
+      - [Generate the certificates](#generate-the-certificates)
+      - [View certificates](#view-certificates)
+    + [KubeConfig file](#kubeconfig-file)
+    + [API endpoints](#api-endpoints)
+    + [Roles](#roles)
+    + [Cluster Roles](#cluster-roles)
+    + [Image security](#image-security)
+    + [Security contexts](#security-contexts)
+    + [Network policy](#network-policy)
+  * [Volumes](#volumes)
+    + [Persistent Volumes](#persistent-volumes)
+    + [Presistent Volume Claims](#presistent-volume-claims)
 
 <!-- tocstop -->
 
@@ -82,7 +112,7 @@ Imperative commands
 
 ```
 # Create a new Pod without Yaml
-kubecl run --generator=run-pod/v1 --image=redis redis
+kubectl run --generator=run-pod/v1 --image=redis redis
 # Generate Pod yaml file without creating the Pod
 kubectl run --generator=run-pod/v1 --image=redis redis --dry-run -o yaml
 # Create a new deployment
@@ -154,10 +184,7 @@ metadata:
 ```
 
 
-
-
-
-### Services
+## K8 Services, Controllers and Resources
 
 
 ### ETCD
@@ -258,52 +285,6 @@ Kubeadm doesn not deploy Kubelet by default, you need to run it manually.
 ### Kube proxy
 Is a process that runs on each Node in the k8s cluster. Every time a new service is created, it will create a rule to route to that new service.
 It uses Ip tables.
-
-### PODs
-[Pods](https://kubernetes.io/docs/concepts/workloads/pods/pod/) is a group of one or more containers (such as Docker containers), with shared storage/network, and a specification for how to run the containers
-
-If 2 containers run in the same POD, they can access each other through `localhost`.
-
-Useful commands
-```
-# Run a new pod
-kubectl run --generator=run-pod/v1 nginx --image=nginx
-# Get pods
-kubetl get pods
-# Get pods with extra info
-kubectl get pods -o wide
-# Create a pod
-kubectl create -f pod.yml
-# Describe a pod
-kubectl describe pod rss-site
-# Delete a pod
-kubectl delete pod rss-site
-# Update a running pod
-kubectl edit pod rss-site
-# Update pod (first change the yaml, then apply it
-kubectl apply -f pod.yml
-```
-
-Pod Yaml
-```
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: my-pod
-  labels:
-    app: web
-spec:
-  containers: # this is an array, so we can have several containers
-    - name: front-end # name of the container)
-      image: nginx # image of the container
-      ports:
-        - containerPort: 80
-    - name: rss-reader # second container
-      image: nickchase/rss-php-nginx:v1
-      ports:
-        - containerPort: 88
-```
 
 ### ReplicationController
 *Note! the recommended way to set up a replication is through a Deployment and ReplicaSet*
@@ -423,317 +404,882 @@ kubectl get rs name-rs -o yaml
 ```
 
 
-### Deployments
-[Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
+## Monitor K8s
 
-Deployment is a wrap around ReplicaSet. But it will allow rolling updated as well
-Creating a new Deployment will create a ReplicaSet, which will create Pods.
+The default metric server only store information in memory, if you want more information you need to install another open source metric-servers. Like:
+- prometheus
+- elastic stack
+- datadog
+- dynatrace
 
-The Yaml is very similiar to ReplicationSet, only some differences.
+Kubelet run inside a `cAdvisor` who will get information of the Node, and send them to the metric servers.
 
-Deployment Yaml
+For use a metric server you can do:
+- `git clone https://github.com/kodekloudhub/kubernetes-metrics-server.git`
+- Then `kubectl apply -f {the just cloned directory}`
+
+
+In K8s, we can log with
 ```
-apiVersion: apps/v1 # NOTE the apiVersion
-kind: Deployment
+# log one Pod
+kubectl logs -f name-pod
+# log one container
+kubectl logs -f name-pod container-name
+```
+
+## Cluster Maintenance
+
+### Draining Nodes
+
+When we want to make an operation in a Node we can drain the node
+```
+kubectl drain node-1
+```
+
+Kubectl will terminate the Pods running in that Node, adding them in other Nodes (Blue green)
+
+Once you have finished with the update, you can add the Node back to rotation, this this will allow the scheduler to add Pods in the Node again.
+
+```
+kubectl uncordon node-1
+```
+
+
+If you want to make sure that new Pods are not added to a Node (but not drain the already running Pods), you can use cordon
+```
+kubectl cordon node-2
+```
+
+## Cluster upgrade of K8s
+
+Check k8 version with
+```
+kubectl get pods
+```
+
+Kubernes version are set like V1.1.1
+
+The resources should be more or less to the same version:
+- kube-apiserver => version X
+- controller-manager => version  X or X-1
+- kube-scheduler => version X or X-1
+- kubelet => version X, X-1 or X-2
+- kube-proxy => version X, X-1 or X-2
+- kubectl => version X+1, X, X-1
+
+So some resources can be 1 version away of the version of kube-api, and other can be 2.
+
+This allow us to upgrade litle by litle.
+
+K8s, usually only maintain the latest 3 versions. And the recommended way to update is upgrade 1 version at a time (not several).
+
+*Kubeadm upgrade*
+strategy1:
+- First update the master Node. When you are updating the master node, `kubectl`, `scheduling` etc. Won't work.
+- Then, update the Workers Nodes one by one.
+
+strategy2:
+- First update the master Node. When you are updating the master node, `kubectl`, `scheduling` etc. Won't work.
+- Then, add more nodes with the newer version, move Pods to this new, and delete the old nodes.
+
+
+[Detail instructions to upgrade](https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/)
+Update the master:
+```
+# If the master is in rotation
+kubectl drain master
+# ssh into the master
+# Will tell you a Summary of current versions and availible. As well how to upgrade
+kubectl drain master
+kubeadm upgrade plan
+kubeadm upgrade apply v1.17.0
+apt upgrade -y kubelet=1.17.0-00
+exit
+kubectl uncordon master
+```
+
+Update the worker nodes:
+```
+# Drain the worker node
+kubectl drain node-1
+# ssh into the node
+kubeadm upgrade node
+apt upgrade -y kubelet=1.17.0-00
+exit
+kubectl uncordon node-1
+```
+
+### Back up and restore
+
+// TODO REDO!!
+One way of backup everything is:
+```
+kubectl get all --all-namespace -o yaml > all-deploy-services.yaml
+```
+
+When we start ETCD, we have to inform variable `data-dir`, here we will save the data from ETCD
+
+As well you can use ETCD to make snapshots
+```
+# make a snapshot
+ETCDCTL_API=3 etcdctl snaptshot save snapshot.db
+# check the status of snapshot
+ETCDCTL_API=3 etcdctl snaptshot status snapshot.db
+# restore the backup:
+  # stop the kube-api server
+service kube-apiserver stop
+  # 
+ETCDCTL_API=3 etcdctl snaptshot restore snapshot.db \
+--data-dir new-data directory
+--initial-cluster ...
+--initial-cluster-token... new token
+--initial-advertise-peer-urls
+# then add the new `data-dir` and the new `initial-cluster-token` in the etcd.service
+# reload the daemon etcd
+systectl daemon-reload
+service etcd restart
+service kube-apiserver start
+```
+
+## Security
+All access to the hosts that form the cluster must be:
+- root ssh disable
+- password ssh diable
+- only ssh-keys access enable
+
+Control access to kube-apiserver:
+- Who can access the cluster -> authentication mecanism
+  - Files username + passwords
+  - Files username + token
+  - certificates
+  - external auth providers (LDAP)
+  - services accounts
+- What can they do 
+  - Role Base Access Controls --> users asigned to groups
+  - Attributes Base Access Control
+  - Node Authorization
+  - Webhook Mode
+
+All the comunications with the different services (ETCD, Kubelet, Kube-proxy, kube scheduler, kube Controller manager) with the kube api-server are secure using TLS encryption.
+
+### Authentication
+
+*Users (admins and Developers)*
+
+The kube-apiserver authenticate the uses before process them.
+
+#### Baic auth + Token auth
+
+Note, this is not a recommended way to auth the kube-api
+
+Note2, We need as well to create the Role and the RoleBindings to this users.
+
+You can have a file with the information as `user-details.csv`
+```
+password13,user1,u0001
+```
+(password, user, user_id)
+You can add a 4 column with the group
+```
+password13,user1,u0001,group1
+```
+
+Then start the kube-apiserver with
+```
+--basic-auth-file=user-details.csv
+```
+
+Then you can authenticate using a curl command like this:
+```
+curl https://master-node-ip:6443/api/v1/pods -u "user1:password123"
+```
+
+For using a token file is similar `user-token-details.csv`
+
+```
+asdfsadfasdfsadasd,user1,id1,group1
+```
+
+And inform restart the kube api-server with the options
+```
+--token-auth-file=user-details.csv
+```
+
+Then you can authenticate using a curl command like this:
+```
+curl https://master-node-ip:6443/api/v1/pods --header "Authorization: Bearer asdfsadfasdfsadasd"
+```
+
+#### PKI in K8s
+
+Check the certification expiration of all the certificates
+```
+sudo kubeadm alpha certs check-expiration
+```
+
+##### Keys and certs needed in K8s
+
+kube api-server:
+  Needs an apiserver.crt and apiserver.key
+  The kube api-server talks with the ETCD server and with the Kubelet server. To auth with them he can use the same apiserver.crt + apiserver.key. Or generate new private/public keys:
+    - apiserver-kubelet-client.crt apiserver-kubelet-client.key
+    - apiserver-etcd-client.crt apiserver-etcd-client.key
+
+ETCD:
+  Needs an etcdserver.crt and etcdserver.key
+
+Kubelet:
+  Needs an kubelet.crt and kubelet.key
+  Kubelet needs to talk with the kube api-server. To auth they can use the same servers key/cert or create new client ones:
+    - kubelet-client.crt
+    - kubelet-client.key
+
+Administrators:
+  Needs an admin.crt and admin.key to auth in the kube api-server
+
+Scheduler:
+  Needs an scheduler.crt and schduler.key to auth in the kube api-server
+  
+Kube-controller manager:
+  Needs a conroller-manager.crt and controller-managerlkey to auth in the kube api-server
+
+Kube-proxy:
+  Needs kube-proxy.crt and kube-proxy.key to auth in the kube-api server
+
+CA:
+  We need at least 1 CA to create the certs, ca.crt and ca.key
+
+
+
+##### Generate the certificates
+
+**key/cert for CA**
+Generate private key for CA:
+```
+openssl genrsa -out ca.key 2048
+```
+
+Generate a Certificate Signing Requests:
+```
+openssl req -new -key ca.key -subj "/CN=KUBERNETES-CA" -out ca.csr
+```
+
+Sign the CA certificate (Self sign with the CA):
+```
+openssl x509 -req -in ca.csr -signkey ca.key -out ca.crt
+```
+
+After that, we will use this certificate to sign all the rest of public keys.
+As well, all the services will need access to this ca.cert.
+
+
+**key/cert for admin client certificates**
+
+Generate a key:
+```
+openssl genrsa -out admin.key 2048
+```
+Generate a Certificate Signing Requests:
+```
+openssl req -new -key admin.key -subj "/CN=kube-admin/O=system:masters" -out admin.csr
+```
+Note, we add the `O` param to add group.
+
+Sign with the CA key:
+```
+openssl x509 -req -in admin.csr -days 365 -CAkey ca.key -CA ca.crt -CAserial file_serial -out admin.crt
+```
+
+For accessing as admin we can do:
+```
+curl https://kube-apiserver:6443/api/v1/pods --key admin.key --cert admin.crt --cacert ca.crt
+```
+
+As well you can use the kub-config.yaml
+```
+apiVersion: v1
+clusters:
+- clusters:
+    certificate-authority: ca.crt
+    server: https://kube-apiserver:6443
+  name: kubernetes
+kind: Config
+users:
+- name: kubernetes-admin
+  user:
+    client_certificate: admin.crt
+    client-key: admin.key
+```
+
+**key/cert for other users**
+Kubernetes ha a native way of handle signup CertificateSIgningRequest.
+
+CertificateSigningRequest Yaml
+```
+apiVersion: certificates.k8s.io/v1beta1
+kind: CertificateSigningRequest
 metadata:
-  name: my-deployment
-  labels:
-    one_label: one_label
+  name: jesus
 spec:
-  template: # templates we input the same as a Pod wihout apiVerion or Kind
-	# Note, we should include template, so if ReplicaSet needs to create a new Pod it knos what to create
-    metadata: name: my-pod
-      labels:
-        app: web
-    spec:
-      containers: # this is an array, so we can have several containers
-        - name: front-end # name of the container)
-          image: nginx # image of the container
-  replicas: 3 # number of replica set
-  selector: # mandatory field 
+  groups:
+  - system:authenticated
+  usages:
+  - digital signature
+  - key encipherment
+  - server auth
+  request:
+    ## The requests is the jesus.csr request encoded in base64
+```
+Note you can do `cat file.csr | base64 | tr -d '\n'
+
+Useful Commands
+```
+# Get all the CSR
+kubectl get csr
+# Approve a CSR
+kubectl certificate approve jesus
+# Deny a CSR
+kubectl certificate deny jesus
+# Get the certificate
+kubectl get csr jesus -o yaml | base64 --decode
+```
+
+
+This is managed by the KubeControllerManager, when you start the kube-controller-manageryou add the CA options
+```
+  --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt
+  --cluster-signing-key-file=/etc/kubernetes/pki/ca.key
+```
+
+**key/cert for system client certificates**
+
+Is the same than the previous step. The only difference is that in the CN (CName), we need to add the `system` before. This should look like:
+```
+-sub "/CN=SYSTEM-KUBE-SCHEDULER"
+-sub "/CN=SYSTEM-KUBE-CONTROLLER_MANAGER"
+-sub "/CN=SYSTEM-KUBE-PROXY"
+```
+
+*server side certificates ETCD*
+ETCD can run a stand alone server, or in a cluster. If run it into a cluster this servers will need to talk to each other, so they will need to authenitcate. You will need to generate several key/cert:
+- etcdserverver.crt etcdserver.key
+- etcdpeer1.crt etcdpeer1.key
+- etcdpeer1.cert etcdpeer1.key
+- etcdpeer2.crt etcdpeer2.key
+
+Each server will need:
+```
+  --key-file=/etcdserver.key
+  --cert-file=/etcdserver.cert
+  --peer-cert-file=/etcdpeer1.crt
+  --peer-cient-cert-auth=true
+  --peer-key-file=/etcdpeer1.key
+  --peer-truested-ca-file=/ca.crt
+  --trusted-ca-file=/ca.crt
+```
+
+**server side certificates Kube-api server**
+You will need to set all the possible CNames (all the names other clients may be call him).
+You can create a openss.cnf
+```
+[req]
+req_extensions = v3_req
+[ v3_req ]
+basicContraints = CA:FALSE
+keyUsage = nonRepudiation,
+subjectAltName = alt_names
+[alt_names]
+DNS.1 = kubernetes
+DNS.2 = kubernetes.default
+DNS.3 = kubernetes.default.svc
+DNS.4 = kubernetes.default.svc.clsuter.local
+IP.1 = 10.96.0.1
+IP.2 = 17.17.0.87
+```
+
+Then you can create the Certificate Signature Request
+```
+openssl -req new -key apiserver.key -sub "/CN=kube-apiserver" -out apiserver.csr -config openssl.cnf
+```
+
+Then you will need to add this in the starting kube-apiserver:
+```
+  --etcd-cafile=/ca.pem
+  --etcd-certfile=/apiserver-etcd-client.crt
+  --etcd-keyfile=/apiserver-etcd-client.key
+  --client-ca-file=/ca.pem
+  --tls-cert-file=/apiserver.crt
+  --tls-private-key-file=/apiserver.key
+  --kuebelet-certificate-authority=/ca.epm
+  --kuebelet-client-certificate=/apiserver-kubelet-client.crt
+  --kuebelet-client-key=/apiserver-kubelet-client.key
+```
+
+*server Kubelet servers*
+Kubelet server run on each node, responsible to manage the node.
+
+You need a key/cert per Node. Each node will have a CN the same as the node (node01, node02..)
+
+Then you can start the kubelet as:
+```
+authentication:
+  x509:
+    clientCAFile: "/ca.pem"
+tlsCertFile: "/kubelet-node01.crt"
+tlsPrivateKeyFile: "/kuebelet-node01.key"
+```
+
+As well you will need to generate client certificates for the Kubelet to access the kube api-server. The CN should be `system:node:node01, system:node:node02...`
+
+**Bots (service accounts)**
+
+##### View certificates
+If the cluster is deployed using kubeadm, we can find the Yaml finds to find the cert/keys.
+```
+/etc/kubernetes/manifests/kube-apiserver.yaml
+```
+
+Get the certifcate file and run
+```
+openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text -noout
+```
+Then check the `Subject` name and the `Alternative Name` names. As well check the Issuer and the expiry date.
+
+So you can check:
+- certificate path is correct
+- CN Name is correct
+- Alt Names are correct
+- Organization is correct
+- Issuer are correct (ca)
+- Epiration is correc (not in the fast)
+
+#### KubeConfig file
+
+When you execute one command
+```
+kubectl get pods
+```
+
+It by default will use the kube-config at `~/.kube/config`, you can specify other config with the flag `--kubeconfig`.
+
+It has 3 sections:
+**Clusters**
+Is the different clusters enviroments you can use (development, production..)
+**Users**
+The users you have access
+**Contexts**
+Context links users with clusters
+
+KubeConfig Yaml
+```
+apiVersion: v1
+kind: Config
+clusters:
+- name: my-kube-playground
+  cluster: 
+    certificate-authority: ca.crt # You can specify the file
+    certificate-authority-data: ca.crt | base64 # you can specify the data directly
+    server: https://asdfaa:64443
+users:
+- name: my-kube-admin
+  user:
+    client-certificate: admin.crt
+    client-key: admin.key
+
+contexts:
+- name: my-kube-admin@my-kube-playground
+  context:
+    cluster: my-kube-playground
+    user: my-kube-admin
+    namespace: name...
+```
+
+Useful context
+```
+# show the config use
+kubectl config view
+# show the current context
+kubectl config currrent-context
+# change context
+kubectl config use-context name-context
+```
+
+#### API endpoints
+
+You can access the API server by different endpoints depending of the action you want to make
+
+To make this calls work, you can do
+```
+kubectl proxy
+```
+
+This will start a proxy in localhost, and you can query without credentials
+
+```
+curl -k http://localhost:6443/version
+# Core functionality (ex. get pods)
+curl -k http://localhost:6443/api
+curl -k http://localhost:6443/api/v1/pods
+# Named groups
+curl -k http://localhost:6443/apis
+curl -k http://localhost:6443/metrics
+curl -k http://localhost:6443/healthz
+curl -k http://localhost:6443/logs
+```
+
+The core group is the legacy group. You can find the oldest resources.
+Tnew new way is the named groups (not everything is migrated)
+In the named groups we can find
+```
+curl -k http://localhost:6443/apis/apps/v1/deployments
+curl -k http://localhost:6443/apis/apps/v1/replicasets
+curl -k http://localhost:6443/apis/apps/v1/statefulsets
+curl -k http://localhost:6443/apis/networking.k8s.io/v1/networkpolicies
+curl -k http://localhost:6443/apis/rbac.authorization.k8s.io/v1/roles
+curl -k http://localhost:6443/apis/certificates.k8s.io/v1/certificatessigningrequests
+```
+
+Notice how the `apiVersion` of the Yaml objects, need to have this apiVersion.
+Example Roles, will use in their yaml
+```
+apiVersoin: rbac.authorization.k8s.io/v1
+```
+
+#### Roles
+
+We can create Role objects
+
+Role Yaml
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: developer
+rules
+- apigroups: [""] # For core group, you can let it blank
+  resources: ["pods"]
+  verbs: ["list", "get", "create", "update", "delete"]
+- apigroups: [""] # For core group, you can let it blank
+  resources: ["configMap"]
+  verbs: ["create']
+```
+
+You can add the namespace in the metadata. As well you can use the option `resourceNames` to limit the access to those resources (i.e. pods names).
+
+Then we need to link Roles an Users, with RoleBinding object
+
+RoleBinding Yaml
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: deveuser-developer-binding
+subjects
+- kind: User
+  name: dev-ser
+  apiGroup: rbac.authorization.k8s.ios
+roleRef
+  kind: Role
+  name: developer
+  apiGroup: rbac.authorization.k8s.ios
+```
+
+Useful commands
+```
+# get roles
+kubectl get roles
+# get the role bindings
+kubectl get rolebinding
+# see more details about one role
+kubectl describe role developer
+# see more details about one role-binding
+kubectl describe rolebinding devuser-developer-binding
+# To check if you have access you can use
+kubectl auth can-i create deployments
+kubectl auth can-i delete nodes
+kubectl auth can-i create deployments --as dev-user
+kubectl auth can-i create pods --as dev-user
+kubectl auth can-i create deployments --as dev-user --namespace test
+```
+
+#### Cluster Roles
+
+All the resources are either namespaced or cluster scoped. Some examples of cluster Scoped are:
+- nodes
+- PV
+- clusterroles
+- clusterrolebindings
+- namespaces
+- certificatesignrequests
+
+They can't be assigned to namepace, they are under cluster.
+
+You can check which resources are namespaced with:
+```
+kubectl api-resources --namespaced=true
+kubectl api-resources --namespaced=false
+```
+
+To allow users to do actions in cluster roles resources, you need Cluster roles and Cluster roles resources
+
+ClusterRole Yaml
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-administrator
+rules
+- apigroups: [""]
+  resources: ["nodes"]
+  verbs: ["list", "get", "create", "update", "delete"]
+```
+
+Then we need to link Roles an Users, with ClusterRoleBinding object
+
+RoleBinding Yaml
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-admin-role-binding
+subjects
+- kind: User
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.ios
+roleRef
+  kind: ClusterRole
+  name: cluster-administrator
+  apiGroup: rbac.authorization.k8s.ios
+```
+
+NOTE! you can create ClusterRoles to not namespaced resources. This will make the user to be able to access all the namespaces for that resources.
+
+#### Image security
+
+By default K8s uses docker hub. For example
+```
+# registri/user/image
+docker.io/nginx/nginx
+# equivalent to
+nginx
+# You can use other registries
+gcr.io/kubernetes-e2e-test-images/dnsutils
+#  You can use a private one (example ECR)
+```
+
+In docker for use a private registry, you need to login into that
+```
+docker login pirivate-registry.io
+```
+
+In K8s you need to create a secret docker-registry
+```
+kubectl create secret docker-registry regcred \
+--docker-server=...\
+--docker-username=...\
+--docker-password=...\
+--docker-email=..
+```
+Then you have to add it in the Pod definition file
+```
+apiVersion: V1
+kind: Pod
+metadata:
+  name: nginx-pod
+spec:
+  containers:
+  - name: nginx
+    image: private-registri.io/apps/my-image
+  imagePullSecrets:
+  - name: regcred
+```
+
+#### Security contexts
+You can configurate them at Pod level or Container level.
+If in both, the container will override the Pod ones.
+
+Example:
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example
+spec:
+  securtyContext:
+    runAsUser:100
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command: ["sleep", "3600"]
+
+# OR
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command: ["sleep", "3600"]
+    securityContext:
+      runAsUser:100
+      capabilities:
+        add: ["MAC_ADMIN"]
+```
+If you define them in the containers, you can add capabilities. (not in the POD)
+
+
+#### Network policy
+By default all the Nodes can comunicate with other nodes in the cluster.
+We can configure Network Policies to Pods to only allow the trafic we want.
+
+
+Ingress: The incoming traffic
+Egress: The outgoing traffic
+
+For example, if we only want the DB to be access by the api-pod.
+
+Network policy YAML
+```
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-policy
+spec:
+  podSelector:
     matchLabels:
-      one_label: one_label 
+      role: db
+    policyTypes:
+    - Ingress
+    ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            name: api-pod
+      ports:
+      - protocl: TCP
+        port: 3306
 ```
 
-Useful commands
-```
-# Create Deployment, note this create a ReplicaSet
-kubectl create -f example-deployment.yaml
-# Get deployments
-kubectl get deployments
-```
 
+### Volumes
 
-### Namespaces
+K8s use the Container Storage Interface to comunicate with volume drivers (like AWS EBS). Is a layer between K8s and the volume drivers (used by other orchestration solutions)
 
-[Namespaces](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
-Is just a virtual cluster inside the physycal cluster.
-
-K8s create a namespace by default:
-- default -> default namespace.
-- kube-system -> K8s set this in a different namespace so you don't delete anything important by default
-- kube-pulic -> 
-
-Each namespace can:
-- Have different policies to define who can do what.
-- Have different resource limits
-
-Inside the same namespace we can connect using only the name of the of the service. If we want to access a service from outside, we can append the name of the service.
-i.e ngnix-service.namespace-name.svc.cluster.local, having:
-- nginx-service -> name of the service
-- namcespace-name -> name of the namespace
-- svc -> service
-- cluster.local -> default domain nameof the k8s cluster
-
-Useful commands
-```
-# Get pods outside the actual namespace
-kubectl get pods -namespace=kube-system
-# Create a pod in a specific namespace
-kubectl create -f pod-defintion.yaml -namespace=namespace-name
-# Create a new namespace
-kubectl create -f exampe-namespace.yaml
-# Create a new namespace (other way)
-kubectl create namespace dev
-# Switch namespace
-kubecton config set-context $(kubectl config current-context) --namespace=name-namespace
-# Get pods in all namespaces
-kubectl get pods --all-namespaces
-```
-
-As well you can add the namespace in the Yaml, in the metadata section
+Example adding a hostPath to a Pod
 ```
 apiVersion: v1
 kind: Pod
 metadata: 
-  name: my-pod
-  namespace: my-nm
-....
+  name: random
+spec:
+  containers:
+  - image: alpine
+    name: alpine
+    command: ["/bind/sh", "-c"]
+    args: ["echo 'hola' >> /opt/say_hi.txt"]
+    volumeMounts:
+    - mountPath: /opt
+      name: data-volume
+  volumes:
+  - name: data-volume
+    hostPath:
+      path: /data
+      type: Directory
 ```
 
-Namespace Yaml
+If instead a hostPath we want to use AWS EBS should be like:
 ```
-apiVesion: v1
-kind: Namespace
+volumes:
+- name: data-volume
+  awsElasticBlockStore:
+    volumeID: volume_id
+    fsType: ext4
+```
+
+#### Persistent Volumes
+They are used to manage storage more centraly (not in the Pods Yaml files).
+
+Persitent volume yaml
+```
+apiVersioN: v1
+kind: PersistentVolume
 metadata:
-  name: namespace-name
+  name: pv-1
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /tmp/data
 ```
 
-### ResourceQuota
+Useful commands
+```
+kubectl get persistentvolume
+```
+AccessModes:
+  - ReadOnlyMany
+  - ReadWriteOnce
+  - ReadWriteMany
 
-[ResourceQuota](https://kubernetes.io/docs/concepts/policy/resource-quotas/)
-Used to set limit of resources to namespaces.
+#### Presistent Volume Claims
+Every Persistent Volume Claim is linked to one Persistent Volume.
+K8s will bind the PVC and PC base on:
+- sufficient capaity.
+- access modes.
+- volume modes.
+- storage class
+- selector
 
-ResourceQuota Yaml
+If K8s binds a large PV to a small PVC (because there not others). K8s won't assign the rest of the PV to another PVC, it will remain unused.
+When not PV are availables, the PVC will remain "pending".
+
+If you want, you can use selectors to bind them.
+
+Persitent Volume Claim Yaml
 ```
 apiVersion: v1
-kind: ResourceQuota
-metadata: 
-  name: quota
-  namespace: namespace-name # The namespace where assign the quota
+kind: PersistentVolumeClaim
+metada:
+  name: myclaim
 spec:
-  hard:
-    pods: "10"
-    requests.cpu: "4"
-    requests.memory: 5Gi
-    limits.cpu: "10"
-    limits.memory: 10Gi
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
 ```
 
-### Services
-[Services](https://kubernetes.io/docs/concepts/services-networking/service/) an abstract way to expose an application running on a set of Pods as a network service.
-
-Service type of services:
-- NodePort. The service make accesible a Pod, through opening a port in the Node. So using the IP of the node and the port, we will be able to access the Pod.
-- ClusterIp. Expoxe the service on a cluster internal IP
-- LoadBalancer. Expose the service using a cloud provider LB.
-
-Useful commands:
+Useful commands
 ```
-# Create new Service
-kubectl create -f example-service.yaml
-# Get the services
-kubectl get services
+kubectl get persistentvolumeclaim
+kubectl delete persistentvolumeclaim volume
 ```
 
-#### NodePort
-Some definitions:
-- TagetPort -> port on the node
-- Port -> port on the service
-- NodePort -> Port on the Node, the valid range is 30000-32767
-- Service IP -> The IP of the service in the cluster - Node IP -> The IP of the service in the cluster
-- Pod IP -> The IP of the Pod
-
-So an user request NodeIp:NodePort, this is proxied to the serviceIP:Port, which is proxied to the PodIp:Targetport 
-
-If there are several pods, they will be choosen a random algorithm. As well they will have SessionAffinity.
-
-If your Pod run in several Nodes, K8s will automaticall will expand to the other Nodes. So this Nodes will have the same port linked.
-
-NodePort Yaml
+We have different behaviours when the PVC is deleted:
 ```
-apiVersoin: v1
-kind: Service
-metadata:
-  name: service-name
-spec:
-  type: NodePort
-  ports: # is an array, you can have several mapings for one service
-   - targetPort: 80 # port on the node. If not provided, will be assigned the same as port
-     port: 80 # port on the service.  Mandatory
-     nodePort: 30001 # port on the node. If not provided, a random will be assigned from the range
-  selector: 
-    label1: label1
-```
-#### ClusterIp
-To expose the service on a cluster internal IP.
-That means that all the Pods of the same type, will have a common IP for use it internally in the cluster.
-
-
-ClusterIp Yaml
-```
-apiVersion: v1
-kind: Service
-metadata:
-  name: clusterip-end
-spec:
-  type: ClusterIp # This is the default, if you don't inform it
-  port:
-    - targetPort: 80 # port of the node
-      port: 80 # port of the service. Mandatory
-   selector:
-     label1: label1
-     label2: label2
+# keep the data (the default one)
+persistentVolumeReclaimPolicy: Retain
+# delete automatically (make the PV available to others PVC)
+persistentVolumeReclaimPolicy: Delete
+# delete automatically and delete the data (will be available to other PVC).
+persistentVolumeReclaimPolicy: Recycle
 ```
 
-### Scheduler
-
-K8s scheduler by default will assign Pods to Nodes. When it does it, it will inform the field `nodeName` in the Pod (with the node where it was assigned).
-
-There are 4 ways to manage which Pods goes to which selectors:
-- NodeName -> inform in the Pod which Node you want to be assigned.
-- NodeSelector -> inform in the Pod the Node using selectors (you need to create first the labels in the Node).
-- Taint and Tolerance. You force Pods not to be assigned in some Nodes. Only the ones with the Tolerance will be able to be assigned (But those with tolerance could be assigned in other Nodes as well).
-- NodeAffinity -> is like NodeSelector but much more advanced.
- 
-#### nodeName
-
-You can manually schedule a Pod informing the `nodeName` field (under `spec`) to the node where you want to schedule it. But you only can inform it at creation time, you can't modify the Pod later with this field.
-
-If you want to change the the `nodeName` on the fly, you will need to create a Binding yaml and send it directoy to kube-api server on that pod.
-
-Binding Yaml
-```
-apiVersion: v1
-kind: Binding
-metadata:
-  name: nginx
-target:
-  apiVersion: v1
-  kind: Node # what to bind
-  name: node02 # the node to bind it with
-```
-
-Then send it to 
-```
-curl --header "Content-Type:application/json" --request POST --data '{"apiVersion":"v1", "kind": "Binding"...' http://$SERVER/api/v1/namespaces/default/pods/$PODNAME/binding/
-```
-
-#### nodeSelectors
-
-Another way to select a node from a Pod, is throuh NodeSelectors
+To add a PVC to a Pod, you need to add:
 ```
 spec:
   containers:
-    ...
-  nodeSelector:
-    size: Large # Labels of the Nodes
+  - name a-container
+    image: nginx
+    volumeMounts:
+    - mountPath: /var/www/html
+      name: mypd
+  volumes:
+  - name: mypd
+    persistentVolumeClaim:
+      claimName: myclaim
 ```
-
-To add labes to the Node use the command
-```
-# where size=large is the label-key and label-value
-kubectl label nodes node01 size=large
-```
-
-Node selectors has a problem, you can't select OR labels, or NOT label.. etc.
-
-#### Taint and Tolerance
-Used to set restrictions into Nodes to accept Pods. Meaning that a Pod won't be able to bschduled in a specif Node. 
-
-For example, K8s set a taint into Master Node, so no Pods can be scheduled there (only the ones with the Tolerance).
-
-You can see the taitn as
-```
-kubecl 	describe node kubemaster | grep Taint
-```
-
-Different from *Node affinity*, which is which Nodes are preferred by the Pods.
-
-Taint is like if a vacine is set in the Nodes, so the pods can't do some actions. Tolerance is like making virus tolerance to that vacine.
-
-For example:
-```
-kubectl taint nodes node1 a=a:NoSchedule
-# a=a the taint (the vacine). Needed to add tolerance later.
-# taint-effect
-#  NoSchedule -> the nodes won't schedule those Pods
-#  PrefereNoSchdule -> the nodes will try not schedule, but there is not guarantee
-#  NoExecute ->  NoShecudle + the Pods already executing will be evicted
-```
-
-The toleration is added directly in the Pods, under `spec`
-```
-spec:
-  containers:
-    ...
-  tolerations:
-  - key:"a"
-    operator:"Equal"
-    value:"a"
-    effect:"NoSchedule"
-```
-
-### NodeAffinity
-Is like Node selectors but more advance.
-
-Example in a Pod.
-```
-spec:
-  containers:
-    ...
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: kubernetes.io/e2e-az-name
-            operator: In
-            values:
-            - e2e-az1
-          - key: size
-            operator: Exists
-	...
-# this is equivalent to
-  nodeSelector:
-    size: Large
-  ...
-```
-
-But there are other operators, for example:
-- NotIn
-- Exists # check if the label key exist
-
-Depending of the behaviour we have other options
-- requiredDuringSchedulingIgnoredDuringExecution
-   - If the Afinnity rules doesn't match any Node on scheduling, it won't be schedules
-   - If when running the Pod, and there are changes (i.e. labels of the Node). Ignore the new changes (Labels on the Pod will be had in account)
-- preferredDuringShedulingIgoreDuringExection ->
-   - If the Afinnity rules doesn't match any Node on scheduling, it will ignore the affinity rules and place the Pod on any Node.
-   - If when running the Pod, and there are changes (i.e. labels of the Node). Ignore the new changes (Labels on the Pod will be had in account)
-- requiredDuringSchedulingRequiredDuringExecution (not available now)->
-   - If the Afinnity rules doesn't match any Node on scheduling, it won't be schedules
-   - If when running the Pod, and there are changes (i.e. labels of the Node). Evicted the Nodes that doesn't match
-
-
-## Daemon Sets

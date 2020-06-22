@@ -16,6 +16,9 @@
 
 ## Introduction
 
+## Creating Docker Images
+
+[great best practices summary](https://lipanski.com/posts/dockerfile-ruby-best-practices)
 
 ## Useful commands
 

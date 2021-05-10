@@ -13,6 +13,7 @@ Prints each character that gets executed
 
 
 ### Special charactters
+```
 space, tab, newline => Separates arguments, if you write several in a row they will be ignored
 $ (expansion) => Parameter expansion $PWD, command substitution $(command), arithmetic expansion $((expression))
 '' (single quotes) => Allows literal meaning, bash won't try to interpretate them
@@ -28,3 +29,4 @@ $ (expansion) => Parameter expansion $PWD, command substitution $(command), arit
 () (Subshell group) => Commands inside will be executed in a subshell
 (()) (Aritmetic expression) => Used for variables assigments or tests
 ~ (Home directory) => Used to represent home directory as ~/Documents or ~jesus/Documents (same)
+```

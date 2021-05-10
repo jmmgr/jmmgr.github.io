@@ -4,15 +4,20 @@
 ### set
 [gnu.org](https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html)
 
-#### set -e
-Inmmediately exit the script if one command fails
-To set it back as normal you can do `set +e`
+Set usually is set at the beginning of the script. The script will behave as `set`, the moment is executed.
 
-#### set -x
-Prints each character that gets executed
+```
+# Inmmediately exit the script if one command fails
+set -e
 
+# To set it back as normal you can do
+set +e
 
-### Special charactters
+# Prints each characters that gets executed
+set -x
+```
+
+### Special characters
 ```
 space, tab, newline => Separates arguments, if you write several in a row they will be ignored
 $ (expansion) => Parameter expansion $PWD, command substitution $(command), arithmetic expansion $((expression))

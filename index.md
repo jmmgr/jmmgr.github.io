@@ -1,9 +1,9 @@
 # wiki
 
-### [bash](bash/index.md)
-### [redis](redis/index.md)
-### [queues](queues/index.md)
-### [mongodb](mongodb/index.md)
+### [Bash](bash/index.md)
+### [Redis](redis/index.md)
+### [Queues](queues/index.md)
+### [Mongodb](mongodb/index.md)
 ### [Terminal tools](terminal_tools/index.md)
 ### [Cryptography](cryptography/index.md)
 ### [Finance](finance/index.md)

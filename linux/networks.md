@@ -197,6 +197,6 @@ For example, get which port is using etcd in our system
 netstat -anp | grep etcd
 # -a = all
 # -n = Show numeric addresses instead of hostname
-# -p = Show the PID of the problem on which thi socket belongs
+# -p = Show the PID of the program on which the socket belongs
 ```
 

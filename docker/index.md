@@ -121,11 +121,50 @@ Will connecte the container to the host network. If you run an application on po
 ```
 docker run -network host nginx
 ```
-Remember to not run several applications in the same port, will fail
+Remember not to run several applications in the same port, will fail
+
+#### Example of host network
+
+```
+docker run --network host nginx
+# curl localhost:80
+```
+
+In docker-compose would be (docker-compose.yml)
+
+```
+services:
+  nginx:
+    image: nginx
+    network_mode: host
+# curl localhost:80
+```
 
 ### Bridge
 Is the default network. A private network is created than docker containers are attached to.
 
+If you want to access from outside our network, you can execute the container like
+```
+docker run -p 8080:80 nginx
+
+# internally dockers create a NAT rule
+iptables -t nat -A DOCKER -j DNAT --dport 8080 -to-destination 172.17.0.2:80 
+```
+
+#### In docker-compose
+By default, docker-compose will create a new bridge network
+
+`test_docker_file1/docker-compose.yml`
+
+```
+services:
+  nginx:
+    image: nginx
+```
+
+Would create a `test_docker_file1_default` network. You still can access the container using the IP of the bridge: `curl 172.19.0.2:80`
+
+#### More technical details
 Docker will create bridge in the host as `docker0`, yo can verify with `ip link` command
 
 Internally docker will create a bridge
@@ -158,17 +197,9 @@ Since docker creates a route, for the docker subnet via docker network, you will
 link route
 # should show something like this
 # 172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 
-docker run nginx -d
+docker run nginx
 curl 172.17.0.2:80
 # should actually render the nginx server
-```
-
-If you want to access from outside our network, you can execute the container like
-```
-docker run -p 8080:80 nginx
-
-# internally dockers create a NAT rule
-iptables -t nat -A DOCKER -j DNAT --dport 8080 -to-destination 172.17.0.2:80 
 ```
 
 ### CNI

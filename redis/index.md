@@ -31,7 +31,7 @@ Delete one element ``` DEL key ```
 
 ### Lists
 
-List are good for adding elements, but expensive to find an element in the middle.
+Lists are good for adding elements, but expensive to find an element in the middle.
 
 Add element to the head ``` LPUSH key element ```
 
@@ -41,17 +41,17 @@ Extract element of a list ``` LPOP key ```
 
 Get all elements in list ``` LRANGE key 0 -1 ```
 
-Lenght of the list ``` LLEN key ```
+Length of the list ``` LLEN key ```
 
 ### Sets
 
-Sets doesn't allow repeated elements, and accesing elements is O(1).
+Sets don't allow repeated elements, and accesing elements is O(1).
 
 Add a new element ``` SADD key element ```
 
-Remove element of a set ``` SREM key element ```
+Remove an element of a set ``` SREM key element ```
 
-Get all element in the set ``` SMEMBERS key ```
+Get all elements in the set ``` SMEMBERS key ```
 
 Verify if a element exists ``` SISMEMBERS key element ```
 

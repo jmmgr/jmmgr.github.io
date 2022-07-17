@@ -4,7 +4,7 @@
 - All the nodes are connected to the same network 192.168.1.0
 - Each node has its own IP (on the same network)
 - Have their own MAC addreses
-- Need to have open some Porst:
+- Need to have open some Ports:
   - Master Nodes:
     - 2379 (ETCD)
     - 2380 (ETCD replication, if you have several master nodes)

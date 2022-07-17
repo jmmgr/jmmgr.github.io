@@ -16,3 +16,4 @@
 ### [VIM](vim/index.md)
 ### [Linux](linux/index.md)
 ### [Docker](linux/docker.md)
+### [Sway](linux/sway.md)

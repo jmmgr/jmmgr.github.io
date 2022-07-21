@@ -2,6 +2,25 @@
 
 ## Branching strategy
 
+### Git Merge
+Git merge is used to integrate changes from one branch into another branch
+![git merge](./what-is-a-merge.gif)
+
+Git merge, creates a **merge commit**. This commit will point to the merged commits. It will make the **non linear commit history**.
+
+One possible way to create a **linear commit history** is to **squash** the commits. On merge, it will create just a one big commit.
+![squash](./squash-on-merge.gif)
+
+The problem with squash merging, is that you will lost the commit history from the merged branch.
+
+Other possible solution is **Fast Forward**.
+![fast-forward](./fast-forward.gif)
+
+Note, you can only use fast forward if the branches haven't diverged. Fast Forward only moves the head.
+
+
+#### 
+
 ### Github Flow
 - **master**: Is the main branch that gets deployed. 
 - **fetures-branch**: These branchs get checkout from the **master** branch, get features changes, and then get merged back in the **master**.
@@ -38,6 +57,6 @@ Is good when there can't be CD, and there is no control the time of the release.
 
 ### Trunk based development
 
-Trunk bases development doesn't use branches. Developers just commit to the **trunk** branch and deploy with CD.
+Trunk bases development doesn't use branches (or very short lived ones). Developers just commit to the **trunk** branch and deploy with CD.
 
 The idea is to deliver fast, so most of the time you will need feature flags (to disable half baked feautures).

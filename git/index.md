@@ -1,26 +1,41 @@
 # Git
 
-## Branching strategy
+## Git Merge
 
-### Git Merge
+#### Merge commit
 Git merge is used to integrate changes from one branch into another branch
 ![git merge](./what-is-a-merge.gif)
 
-Git merge, creates a **merge commit**. This commit will point to the merged commits. It will make the **non linear commit history**.
+Git merge, creates a **merge commit**. This commit will point to the merged commits. It will make a **non linear commit history**.
 
+#### Squash commits
 One possible way to create a **linear commit history** is to **squash** the commits. On merge, it will create just a one big commit.
 ![squash](./squash-on-merge.gif)
 
 The problem with squash merging, is that you will lost the commit history from the merged branch.
 
-Other possible solution is **Fast Forward**.
+#### Fast forward
+Other possible solution is **fast forward**.
 ![fast-forward](./fast-forward.gif)
 
 Note, you can only use fast forward if the branches haven't diverged. Fast Forward only moves the head.
 
+#### Rebase
+Rebase can be use to merge 2 branches.
+- If the branches hasn't diverged, it behaves as **fast forward**.
+- If the branches has diverged, will re-arrange the commits from your branch.
 
-#### 
+In this example some commits were added in the master branch, so in a **rebase** they will be added before the commits in the feature branch.
+![rebase](./rebase.gif)
 
+Notice, that **your local commits will change** (different hash). So is a **disruptive operation**.
+
+Since it will re-arrange the commit history **Don't perform this operation in a public branch**
+
+## PR merge
+
+
+## Branching strategy
 ### Github Flow
 - **master**: Is the main branch that gets deployed. 
 - **fetures-branch**: These branchs get checkout from the **master** branch, get features changes, and then get merged back in the **master**.

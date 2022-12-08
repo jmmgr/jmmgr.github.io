@@ -9,7 +9,7 @@ Wiki of knowledge I keep forgetting
 
 [Grip](https://github.com/joeyespo/grip) allows to preview in local with Github templates.
 
-dInstall
+Install
 
 ```
 pip install grip
@@ -69,3 +69,4 @@ hide code
 ```
 </p>
 </details>
+
